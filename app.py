@@ -17,9 +17,14 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    weather_data = None
+    if request.method == 'POST':
+        city = request.form.get('city')
+        if city:
+            weather_data = get_weather(city)
+    return render_template('index.html', weather=weather_data, is_premium=current_user.is_authenticated and current_user.is_premium)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -29,7 +34,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
-            return redirect(url_for('weather'))
+            return redirect(url_for('index'))
         else:
             flash('Invalid username or password')
     return render_template('login.html')
@@ -57,22 +62,12 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/weather', methods=['GET', 'POST'])
-@login_required
-def weather():
-    weather_data = None
-    if request.method == 'POST':
-        city = request.form.get('city')
-        if city:
-            weather_data = get_weather(city)
-    return render_template('weather.html', weather=weather_data, is_premium=current_user.is_premium)
-
 @app.route('/weather_history')
 @login_required
 def weather_history():
     if not current_user.is_premium:
         flash('This feature is available for premium users only.')
-        return redirect(url_for('weather'))
+        return redirect(url_for('index'))
     # Here you can add the logic to get and display weather data for the past week
     weather_data = get_weather_history()
     return render_template('weather_history.html', weather=weather_data)
