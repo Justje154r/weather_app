@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config, API_KEY
-from models import db, User
+from models import db, User, Favorite
 import requests
 
 app = Flask(__name__)
@@ -62,15 +62,34 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/weather_history')
+@app.route('/favorites', methods=['GET', 'POST'])
 @login_required
-def weather_history():
-    if not current_user.is_premium:
-        flash('This feature is available for premium users only.')
-        return redirect(url_for('index'))
-    # Here you can add the logic to get and display weather data for the past week
-    weather_data = get_weather_history()
-    return render_template('weather_history.html', weather=weather_data)
+def favorites():
+    if request.method == 'POST':
+        city = request.form.get('city')
+        country = request.form.get('country')
+        if city and country:
+            favorite = Favorite(city=city, country=country, user_id=current_user.id)
+            db.session.add(favorite)
+            db.session.commit()
+            flash('Favorite added successfully')
+    favorites = Favorite.query.filter_by(user_id=current_user.id).all()
+    return render_template('favorites.html', favorites=favorites)
+
+@app.route('/delete_favorite/<int:id>')
+@login_required
+def delete_favorite(id):
+    favorite = Favorite.query.get(id)
+    if favorite and favorite.user_id == current_user.id:
+        db.session.delete(favorite)
+        db.session.commit()
+        flash('Favorite deleted successfully')
+    return redirect(url_for('favorites'))
+
+@app.route('/map')
+@login_required
+def map():
+    return render_template('map.html')
 
 def get_weather(city):
     url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={API_KEY}'
@@ -82,10 +101,6 @@ def get_weather(city):
         return weather
     else:
         return None
-
-def get_weather_history():
-    # Add logic to get weather data for the past week, for example, by querying an API that provides such data
-    pass
 
 def get_weather_icon(weather_condition):
     icons = {
