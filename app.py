@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from jinja2 import FileSystemLoader
+from jinja2 import Environment, select_autoescape
 from config import Config, API_KEY
 from models import db, User, Favorite
 import requests
@@ -9,6 +11,10 @@ import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Настройка пользовательского загрузчика шаблонов
+template_loader = FileSystemLoader(searchpath="./")
+app.jinja_loader = template_loader
 
 db.init_app(app)
 login_manager = LoginManager(app)
@@ -42,7 +48,7 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST']:
+    if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
@@ -66,7 +72,7 @@ def logout():
 @app.route('/favorites', methods=['GET', 'POST'])
 @login_required
 def favorites():
-    if request.method == 'POST']:
+    if request.method == 'POST':
         city = request.form.get('city')
         country = request.form.get('country')
         if city and country:
