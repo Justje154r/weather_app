@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorites</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Favorites</h1>
+        <form method="post">
+            <input type="text" name="city" placeholder="City" required>
+            <input type="text" name="country" placeholder="Country" required>
+            <button type="submit">Add Favorite</button>
+        </form>
+        <h2>Saved Favorites</h2>
+        <ul>
+            {% for favorite in favorites %}
+                <li>{{ favorite.city }}, {{ favorite.country }} <a href="{{ url_for('delete_favorite', id=favorite.id) }}">Delete</a></li>
+            {% endfor %}
+        </ul>
+        <p><a href="{{ url_for('index') }}">Back to Weather</a></p>
+    </div>
+</body>
+</html>

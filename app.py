@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config, API_KEY
 from models import db, User, Favorite
 import requests
+import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -41,7 +42,7 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
+    if request.method == 'POST']:
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
@@ -65,7 +66,7 @@ def logout():
 @app.route('/favorites', methods=['GET', 'POST'])
 @login_required
 def favorites():
-    if request.method == 'POST':
+    if request.method == 'POST']:
         city = request.form.get('city')
         country = request.form.get('country')
         if city and country:
