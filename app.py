@@ -1,9 +1,8 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from jinja2 import FileSystemLoader
-from jinja2 import Environment, select_autoescape
 from config import Config, API_KEY
 from models import db, User, Favorite
 import requests
@@ -97,6 +96,10 @@ def delete_favorite(id):
 @login_required
 def map():
     return render_template('map.html')
+
+@app.route('/styles.css')
+def styles():
+    return send_from_directory('.', 'styles.css')
 
 def get_weather(city):
     url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={API_KEY}'
