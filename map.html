@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Map</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('styles') }}">
     <style>
-        /* Убедитесь, что у контейнера карты есть размер */
         #map {
             height: 500px;
             width: 100%;
@@ -19,7 +18,6 @@
         <div id="map"></div>
         <p><a href="{{ url_for('index') }}">Back to Weather</a></p>
     </div>
-    <!-- Скрипт инициализации карты -->
     <script>
         function initMap() {
             var map = new google.maps.Map(document.getElementById('map'), {
@@ -34,19 +32,18 @@
             });
         }
 
-        // Функция для динамической загрузки скрипта
-        function loadScript(url, callback){
-            var script = document.createElement("script")
+        function loadScript(url, callback) {
+            var script = document.createElement("script");
             script.type = "text/javascript";
-            if (script.readyState){  // only required for IE <9
-                script.onreadystatechange = function(){
-                    if (script.readyState == "loaded" || script.readyState == "complete"){
+            if (script.readyState) {  // only required for IE <9
+                script.onreadystatechange = function() {
+                    if (script.readyState == "loaded" || script.readyState == "complete") {
                         script.onreadystatechange = null;
                         callback();
                     }
                 };
-            } else {  //Others
-                script.onload = function(){
+            } else {  // Others
+                script.onload = function() {
                     callback();
                 };
             }
@@ -55,7 +52,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            loadScript("https://maps.googleapis.com/maps/api/js?key=AIzaSyDkN-JpueYw5WCvf4f_9F542Kac96vN2ZU&callback=initMap", function() {
+            loadScript("https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap", function() {
                 console.log("Google Maps API script loaded.");
             });
         });
